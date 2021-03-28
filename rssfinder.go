@@ -8,6 +8,7 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
+// Feed is a type of RSS feed.
 type Feed struct {
 	Type  string
 	Href  string
@@ -29,6 +30,7 @@ var rssTypes = map[string]struct{}{
 	"text/rdf":             {},
 }
 
+// Find finds feeds from URL.
 func Find(url string) ([]*Feed, error) {
 	res, err := http.Get(url)
 	if err != nil {
