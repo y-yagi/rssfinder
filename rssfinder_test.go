@@ -46,5 +46,8 @@ func dummyHandler(w http.ResponseWriter, r *http.Request) {
 	<body />
 </html>
 	`
-	w.Write([]byte(body))
+	_, err := w.Write([]byte(body))
+	if err != nil {
+		panic(err)
+	}
 }
