@@ -8,11 +8,11 @@ import (
 	"github.com/y-yagi/rssfinder"
 )
 
-func TestRun(t *testing.T) {
+func TestFind(t *testing.T) {
 	testserver := httptest.NewServer(http.HandlerFunc(dummyHandler))
 	defer testserver.Close()
 
-	result, err := rssfinder.Run(testserver.URL)
+	result, err := rssfinder.Find(testserver.URL)
 	if err != nil {
 		t.Error(err)
 	}

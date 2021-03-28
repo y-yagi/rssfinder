@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-type RSS struct {
+type Feed struct {
 	Type  string
 	Href  string
 	Title string
@@ -29,7 +29,7 @@ var rssTypes = map[string]struct{}{
 	"text/rdf":             {},
 }
 
-func Run(url string) ([]*RSS, error) {
+func Find(url string) ([]*Feed, error) {
 	res, err := http.Get(url)
 	if err != nil {
 		return nil, err
@@ -47,48 +47,48 @@ func Run(url string) ([]*RSS, error) {
 		return nil, err
 	}
 
-	var result []*RSS
-	findRSSs(node, &result)
+	var feeds []*Feed
+	findFeeds(node, &feeds)
 
-	return result, nil
+	return feeds, nil
 }
 
-func buildRSS(node *html.Node) *RSS {
-	rss := &RSS{}
+func buildFeed(node *html.Node) *Feed {
+	feed := &Feed{}
 	for _, v := range node.Attr {
 		if v.Key == "type" {
 			if _, found := rssTypes[v.Val]; !found {
 				return nil
 			}
-			rss.Type = v.Val
+			feed.Type = v.Val
 		}
 
 		if v.Key == "href" {
-			rss.Href = v.Val
+			feed.Href = v.Val
 		}
 
 		if v.Key == "title" {
-			rss.Title = v.Val
+			feed.Title = v.Val
 		}
 	}
 
-	if len(rss.Type) == 0 {
+	if len(feed.Type) == 0 {
 		return nil
 	}
 
-	return rss
+	return feed
 }
 
-func findRSSs(node *html.Node, result *[]*RSS) {
+func findFeeds(node *html.Node, feeds *[]*Feed) {
 	for c := node.FirstChild; c != nil; c = c.NextSibling {
 		if c.Type == html.ElementNode {
 			if c.DataAtom == atom.Link {
-				rss := buildRSS(c)
+				rss := buildFeed(c)
 				if rss != nil {
-					*result = append(*result, rss)
+					*feeds = append(*feeds, rss)
 				}
 			}
-			findRSSs(c, result)
+			findFeeds(c, feeds)
 		}
 	}
 }
