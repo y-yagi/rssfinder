@@ -1,6 +1,7 @@
 # rssfinder
 
 [![Build Status](https://github.com/y-yagi/rssfinder/actions/workflows/ci.yml/badge.svg)](https://github.com/y-yagi/rssfinder/actions/workflows/ci.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/y-yagi/rssfinder.svg)](https://pkg.go.dev/github.com/y-yagi/rssfinder)
 
 `rssfinder` is a library that finds RSS feeds from an URL.
 
