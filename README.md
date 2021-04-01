@@ -17,7 +17,7 @@ import (
 )
 
 func main() {
-	feeds, err := rssfinder.Find("https://github.com/y-yagi/rssfinder/tags")
+	feeds, err := rssfinder.Find("https://github.com/y-yagi/rssfinder/releases")
 	if err != nil {
 		fmt.Printf("Find error: %v\n", err)
 		return
@@ -25,7 +25,8 @@ func main() {
 
 	for _, feed := range feeds {
 		fmt.Printf("Type: '%v', Title: '%v', Href: '%v'\n", feed.Type, feed.Title, feed.Href)
-		// Type: 'application/atom+xml', Title: 'Recent Commits to rssfinder:master', Href: 'https://github.com/y-yagi/rssfinder/commits/master.atom'
+		// Type: 'application/atom+xml', Title: 'rssfinder Release Notes', Href: 'https://github.com/y-yagi/rssfinder/releases.atom'
+		// Type: 'application/atom+xml', Title: 'rssfinder Tags', Href: 'https://github.com/y-yagi/rssfinder/tags.atom'
 	}
 }
 ```
