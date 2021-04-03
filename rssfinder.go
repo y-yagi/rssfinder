@@ -3,6 +3,8 @@ package rssfinder
 import (
 	"fmt"
 	"net/http"
+	"path"
+	"strings"
 
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
@@ -50,12 +52,12 @@ func Find(url string) ([]*Feed, error) {
 	}
 
 	var feeds []*Feed
-	findFeeds(node, &feeds)
+	findFeeds(node, &feeds, url)
 
 	return feeds, nil
 }
 
-func buildFeed(node *html.Node) *Feed {
+func buildFeed(node *html.Node, url string) *Feed {
 	feed := &Feed{}
 	for _, v := range node.Attr {
 		if v.Key == "type" {
@@ -66,7 +68,11 @@ func buildFeed(node *html.Node) *Feed {
 		}
 
 		if v.Key == "href" {
-			feed.Href = v.Val
+			if strings.HasPrefix(v.Val, "http") {
+				feed.Href = v.Val
+			} else {
+				feed.Href = path.Join(url, v.Val)
+			}
 		}
 
 		if v.Key == "title" {
@@ -81,16 +87,16 @@ func buildFeed(node *html.Node) *Feed {
 	return feed
 }
 
-func findFeeds(node *html.Node, feeds *[]*Feed) {
+func findFeeds(node *html.Node, feeds *[]*Feed, url string) {
 	for c := node.FirstChild; c != nil; c = c.NextSibling {
 		if c.Type == html.ElementNode {
 			if c.DataAtom == atom.Link {
-				rss := buildFeed(c)
+				rss := buildFeed(c, url)
 				if rss != nil {
 					*feeds = append(*feeds, rss)
 				}
 			}
-			findFeeds(c, feeds)
+			findFeeds(c, feeds, url)
 		}
 	}
 }
