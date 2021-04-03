@@ -3,6 +3,7 @@ package rssfinder
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"path"
 	"strings"
 
@@ -57,7 +58,7 @@ func Find(url string) ([]*Feed, error) {
 	return feeds, nil
 }
 
-func buildFeed(node *html.Node, url string) *Feed {
+func buildFeed(node *html.Node, baseurl string) *Feed {
 	feed := &Feed{}
 	for _, v := range node.Attr {
 		if v.Key == "type" {
@@ -71,7 +72,9 @@ func buildFeed(node *html.Node, url string) *Feed {
 			if strings.HasPrefix(v.Val, "http") {
 				feed.Href = v.Val
 			} else {
-				feed.Href = path.Join(url, v.Val)
+				u, _ := url.Parse(baseurl)
+				u.Path = path.Join(u.Path, v.Val)
+				feed.Href = u.String()
 			}
 		}
 
@@ -87,16 +90,16 @@ func buildFeed(node *html.Node, url string) *Feed {
 	return feed
 }
 
-func findFeeds(node *html.Node, feeds *[]*Feed, url string) {
+func findFeeds(node *html.Node, feeds *[]*Feed, baseurl string) {
 	for c := node.FirstChild; c != nil; c = c.NextSibling {
 		if c.Type == html.ElementNode {
 			if c.DataAtom == atom.Link {
-				rss := buildFeed(c, url)
+				rss := buildFeed(c, baseurl)
 				if rss != nil {
 					*feeds = append(*feeds, rss)
 				}
 			}
-			findFeeds(c, feeds, url)
+			findFeeds(c, feeds, baseurl)
 		}
 	}
 }

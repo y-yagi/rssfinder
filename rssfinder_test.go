@@ -3,7 +3,6 @@ package rssfinder_test
 import (
 	"net/http"
 	"net/http/httptest"
-	"path"
 	"testing"
 
 	"github.com/y-yagi/rssfinder"
@@ -90,7 +89,7 @@ func TestFind_RelatvePath(t *testing.T) {
 		t.Errorf("Expect type is 'feed, but got %v.", result[0].Title)
 	}
 
-	expected := path.Join(testserver.URL, "rss")
+	expected := testserver.URL + "/rss"
 	if result[0].Href != expected {
 		t.Errorf("Expect href is '%v', but got %v.", expected, result[0].Href)
 	}
