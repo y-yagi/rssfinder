@@ -9,7 +9,25 @@ import (
 )
 
 func TestFind(t *testing.T) {
-	testserver := httptest.NewServer(http.HandlerFunc(dummyHandler))
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		body := `
+<html>
+  <head>
+  	<meta charset="UTF-8">
+  	<link rel="profile" href="https://gmpg.org/xfn/11" />
+  	<link rel="alternate" type="application/rss+xml" title="feed" href="http://localhost/feed/" />
+  	<link rel="stylesheet" type="text/css" media="all" />
+  </head>
+	<body />
+</html>
+	`
+		_, err := w.Write([]byte(body))
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	testserver := httptest.NewServer(http.HandlerFunc(handler))
 	defer testserver.Close()
 
 	result, err := rssfinder.Find(testserver.URL)
@@ -31,23 +49,5 @@ func TestFind(t *testing.T) {
 
 	if result[0].Href != "http://localhost/feed/" {
 		t.Errorf("Expect type is 'http://localhost/feed/', but got %v.", result[0].Href)
-	}
-}
-
-func dummyHandler(w http.ResponseWriter, r *http.Request) {
-	body := `
-<html>
-  <head>
-  	<meta charset="UTF-8">
-  	<link rel="profile" href="https://gmpg.org/xfn/11" />
-  	<link rel="alternate" type="application/rss+xml" title="feed" href="http://localhost/feed/" />
-  	<link rel="stylesheet" type="text/css" media="all" />
-  </head>
-	<body />
-</html>
-	`
-	_, err := w.Write([]byte(body))
-	if err != nil {
-		panic(err)
 	}
 }
