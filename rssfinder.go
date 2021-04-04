@@ -18,6 +18,10 @@ type Feed struct {
 	Title string
 }
 
+type finder struct {
+	url string
+}
+
 var rssTypes = map[string]struct{}{
 	"application/rss+xml":  {},
 	"application/atom+xml": {},
@@ -35,7 +39,12 @@ var rssTypes = map[string]struct{}{
 
 // Find finds feeds from URL.
 func Find(url string) ([]*Feed, error) {
-	res, err := http.Get(url)
+	f := finder{url: url}
+	return f.find()
+}
+
+func (f *finder) find() ([]*Feed, error) {
+	res, err := http.Get(f.url)
 	if err != nil {
 		return nil, err
 	}
@@ -53,12 +62,12 @@ func Find(url string) ([]*Feed, error) {
 	}
 
 	var feeds []*Feed
-	findFeeds(node, &feeds, url)
+	f.findFeeds(node, &feeds)
 
 	return feeds, nil
 }
 
-func buildFeed(node *html.Node, baseurl string) *Feed {
+func (f *finder) buildFeed(node *html.Node) *Feed {
 	feed := &Feed{}
 	for _, v := range node.Attr {
 		if v.Key == "type" {
@@ -72,7 +81,7 @@ func buildFeed(node *html.Node, baseurl string) *Feed {
 			if strings.HasPrefix(v.Val, "http") {
 				feed.Href = v.Val
 			} else {
-				u, _ := url.Parse(baseurl)
+				u, _ := url.Parse(f.url)
 				u.Path = path.Join(u.Path, v.Val)
 				feed.Href = u.String()
 			}
@@ -90,16 +99,16 @@ func buildFeed(node *html.Node, baseurl string) *Feed {
 	return feed
 }
 
-func findFeeds(node *html.Node, feeds *[]*Feed, baseurl string) {
+func (f *finder) findFeeds(node *html.Node, feeds *[]*Feed) {
 	for c := node.FirstChild; c != nil; c = c.NextSibling {
 		if c.Type == html.ElementNode {
 			if c.DataAtom == atom.Link {
-				rss := buildFeed(c, baseurl)
+				rss := f.buildFeed(c)
 				if rss != nil {
 					*feeds = append(*feeds, rss)
 				}
 			}
-			findFeeds(c, feeds, baseurl)
+			f.findFeeds(c, feeds)
 		}
 	}
 }
