@@ -57,7 +57,7 @@ func (f *finder) find() ([]*Feed, error) {
 
 	node, err := html.Parse(res.Body)
 	if err != nil {
-		err := fmt.Errorf("html parse error: %v", err)
+		err := fmt.Errorf("html parse error: %w", err)
 		return nil, err
 	}
 
