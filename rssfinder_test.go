@@ -36,7 +36,7 @@ func TestFind(t *testing.T) {
 	}
 
 	if len(result) != 1 {
-		t.Errorf("Expect rss count is 1, but got %v.", len(result))
+		t.Fatalf("Expect rss count is 1, but got %v.", len(result))
 	}
 
 	if result[0].Type != "application/rss+xml" {
@@ -78,7 +78,7 @@ func TestFind_RelatvePath(t *testing.T) {
 	}
 
 	if len(result) != 1 {
-		t.Errorf("Expect rss count is 1, but got %v.", len(result))
+		t.Fatalf("Expect rss count is 1, but got %v.", len(result))
 	}
 
 	if result[0].Type != "application/rss+xml" {
